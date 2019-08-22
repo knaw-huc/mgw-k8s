@@ -1,0 +1,55 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mgw-mysql
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mgw-mysql
+    spec:
+      containers:
+      - name: mysql
+        image: registry.diginfra.net/mysql:5.6
+        resources:
+          limits:
+            cpu: 200m
+            memory: 500Mi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: rootpw
+        - name: MYSQL_DATABASE
+          value: mgw
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: mgw_user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: mgw_password
+        ports:
+        - containerPort: 3306
+          name: mgw-mysql
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: mgw-mysql-data
+      volumes:
+      - name: mgw-mysql-data
+        persistentVolumeClaim:
+          claimName: mgw-pvc

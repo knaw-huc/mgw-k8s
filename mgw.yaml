@@ -1,0 +1,162 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: mgw-mysql
+  name: mgw-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mgw-mysql-credentials
+type: Opaque
+data:
+  rootpw: cDcyOGRoYXN1dnNmMmpmdDdqZXp1aA==  # p728dhasuvsf2jft7jezuh
+  mgw_user: YnJvd3Nlcg== # browser
+  mgw_password: YnJvd3NpZQ== # browsie
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mgw-mysql
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mgw-mysql
+    spec:
+      containers:
+      - name: mysql
+        image: registry.diginfra.net/mysql:5.6
+        resources:
+          limits:
+            cpu: 200m
+            memory: 500Mi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: rootpw
+        - name: MYSQL_DATABASE
+          value: mgw
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: mgw_user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: mgw_password
+        ports:
+        - containerPort: 3306
+          name: mgw-mysql
+        volumeMounts:
+        - mountPath: /var/lib/mysql
+          name: mgw-mysql-data
+      volumes:
+      - name: mgw-mysql-data
+        persistentVolumeClaim:
+          claimName: mgw-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mgw-mysql-service
+  labels:
+    app: mgw-mysql
+spec:
+  selector:
+    app: mgw-mysql
+  ports:
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mgw-php
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mgw-php
+        external-ingress: enabled
+    spec:
+      containers:
+      - name: php
+        image: registry.diginfra.net/apache-php:latest
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        env:
+        - name: MGW_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: mgw_user
+        - name: MGW_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: mgw_password
+        ports:
+        - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mgw-php
+  annotations:
+    traefik.ingress.kubernetes.io/affinity: "true"
+spec:
+  selector:
+    app: mgw-php
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80 # This is where the pod listens to`
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mgw
+spec:
+  rules:
+  - host: mgw.diginfra.net
+    http:
+      paths:
+      - backend:
+          serviceName: mgw-php
+          servicePort: http

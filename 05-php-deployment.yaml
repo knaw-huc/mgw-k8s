@@ -1,0 +1,41 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: mgw-php
+spec:
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mgw-php
+        external-ingress: enabled
+    spec:
+      containers:
+      - name: php
+        image: registry.diginfra.net/apache-php:latest
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        env:
+        - name: MGW_MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: mgw_user
+        - name: MGW_MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mgw-mysql-credentials
+              key: mgw_password
+        ports:
+        - containerPort: 80

@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mgw-mysql-service
+  labels:
+    app: mgw-mysql
+spec:
+  selector:
+    app: mgw-mysql
+  ports:
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: 3306

@@ -1,0 +1,162 @@
+default namespace zetten:
+$ kubectl config set-context $(kubectl config current-context) --namespace=janpieterk-playground
+
+
+$ kubectl -n janpieterk apply -f pvc.yaml
+
+pvc bleef de hele tijd op "pending" staan. Oplossing: 
+
+  selector:
+    matchLabels:
+      app: mgw
+      
+Weghalen. Dat moet er niet staan in de yaml file.
+
+$ kubectl -n janpieterk apply -f mysql-credentials.yaml
+Error from server (BadRequest): error when creating "mysql-credentials.yaml": Secret in version "v1" cannot be handled as a Secret: v1.Secret.Data: decode base64: illegal base64 data at input byte 4, error found in #10 byte of ...|:"browsie","rootpw":|..., bigger context ...|{"apiVersion":"v1","data":{"password":"browsie","rootpw":"p728dhasuvsf2jft7jezuh","user":"browser|...
+
+Oplossing: waardes van secrets moeten base64 gecodeerd zijn.
+
+Mysql deployment komt hier vandaan: https://portworx.com/run-ha-mysql-google-kubernetes-engine/
+
+$ kubectl -n janpieterk apply -f mysql.yaml 
+deployment.extensions "mgw-mysql" created
+$ kubectl -n janpieterk get deployments
+NAME        DESIRED   CURRENT   UP-TO-DATE   AVAILABLE   AGE
+mgw-mysql   1         0         0            0           16s
+
+niet gelukt dus.
+
+$ kubectl -n janpieterk describe deployment  mgw-mysql
+[...]
+  Progressing      True    NewReplicaSetCreated
+  Available        True    MinimumReplicasAvailable
+  ReplicaFailure   True    FailedCreate
+[...]
+
+$ kubectl -n janpieterk describe deployment  mgw-mysql
+[...]
+  Available        True    MinimumReplicasAvailable
+  ReplicaFailure   True    FailedCreate
+  Progressing      False   ProgressDeadlineExceeded
+OldReplicaSets:    <none>
+NewReplicaSet:     mgw-mysql-5bcb76854d (0/1 replicas created)
+[...]
+
+Probleem vinden: 
+
+$ kubectl -n janpieterk describe replicaset mgw-mysql-5bcb76854d
+[...]
+Warning  FailedCreate  13m               replicaset-controller  Error creating: pods "mgw-mysql-5bcb76854d-28czp" is forbidden: failed quota: group: must specify limits.cpu,limits.memory,requests.cpu,requests.memory
+Warning  FailedCreate  2m (x9 over 13m)  replicaset-controller  (combined from similar events): Error creating: pods "mgw-mysql-5bcb76854d-r7fhg" is forbidden: failed quota: group: must specify limits.cpu,limits.memory,requests.cpu,requests.memory
+
+Geen quota aangegeven dus.
+
+$ kubectl -n janpieterk apply -f mysql.yaml 
+deployment.extensions "mgw-mysql" configured
+$ kubectl -n janpieterk describe deployment  mgw-mysql
+[...]
+Available      True    MinimumReplicasAvailable
+  Progressing    True    ReplicaSetUpdated
+OldReplicaSets:  <none>
+NewReplicaSet:   mgw-mysql-576cfd8dc6 (1/1 replicas created)
+
+Nu wel gelukt. Maar: 
+
+$ kubectl -n janpieterk get pods
+NAME                         READY     STATUS    RESTARTS   AGE
+mgw-mysql-576cfd8dc6-2qk2z   0/1       Pending   0          5m
+
+$ kubectl -n janpieterk  rollout status deployment mgw-mysql
+error: deployment "mgw-mysql" exceeded its progress deadline
+
+Probleem: er stond "schedulerName: stork" in de gekopieerde file. Weggehaald.
+
+$ kubectl -n janpieterk apply -f mysql.yaml 
+deployment.extensions "mgw-mysql" configured
+$ kubectl -n janpieterk get pods
+NAME                         READY     STATUS             RESTARTS   AGE
+mgw-mysql-58df54779d-qlhvx   0/1       CrashLoopBackOff   3          1m
+$ kubectl -n janpieterk logs mgw-mysql-58df54779d-qlhvx
+error: database is uninitialized and password option is not specified 
+  You need to specify one of MYSQL_ROOT_PASSWORD, MYSQL_ALLOW_EMPTY_PASSWORD and MYSQL_RANDOM_ROOT_PASSWORD
+
+Er stond geen verwijzing naar
+secretKeyRef:
+  name: mgw-mysql-credentials
+in de deployment. Toegevoegd.
+
+Nu werkt het:
+
+$ kubectl -n janpieterk get pods
+NAME                         READY     STATUS    RESTARTS   AGE
+mgw-mysql-8455c9799d-z6s5c   1/1       Running   0          31s
+
+$ kubectl -n janpieterk exec -it mgw-mysql-8455c9799d-z6s5c /bin/bash
+root@mgw-mysql-8455c9799d-z6s5c:/# 
+# mysql -u root --password="${MYSQL_ROOT_PASSWORD}" 
+mysql>
+
+zie ook https://docs.docker.com/samples/library/mysql/
+
+dump van mgw in image zetten.
+Dockerfile:
+
+FROM mysql:5.6
+COPY mgw.sql /docker-entrypoint-initdb.d/
+
+$ docker build .
+$ docker tag be83b8b3bced registry.diginfra.net/mysql:5.6
+$ docker push registry.diginfra.net/mysql:5.6
+
+maar database mgw wordt niet gevuld. Niet goed mogelijk om dat automatisch te doen.
+probeer nu dit:
+
+===========================================
+root@mgw-mysql-67dc886f89-s4fbm:/# mysql -u root --password="${MYSQL_ROOT_PASSWORD}" mgw < /docker-entrypoint-initdb.d/mgw.sql
+Warning: Using a password on the command line interface can be insecure.
+ERROR 1064 (42000) at line 21: You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'DATBASE IF EXISTS mgw' at line 1
+maar lukt me niet om 'DATBASE' weg te krijgen hoewel ik image gerebuild heb, ook met --no-cache. Blijft hangen in de registry ofzo? Maandag uitzoeken.
+===========================================
+(onduidelijk, laat maar)
+
+poging om service voor mysql deployment te maken
+
+$ kubectl apply -f mysql-service.yaml
+service "mgw-mysql-service" created
+
+Dit in dbconnectiegegevens voor php app gezet:
+
+$db['default']['hostname'] = gethostbyname('mgw-mysql-service');
+$db['default']['username'] = getenv('MGW_MYSQL_USER');
+$db['default']['password'] = getenv('MGW_MYSQL_PASSWORD');
+$db['default']['database'] = "mgw";
+
+Gaat dat werken?
+
+Docker build als hierboven
+
+$ kubectl apply -f php-deployment.yaml
+werkt niet, limits overschreden. Limieten: alles van alle deployments binnen de namespace bij elkaar optellen
+
+gethostbyname werkt niet:
+
+# php -r "echo gethostbyname('mgw-mysql-service') . \"\n\";"
+mgw-mysql-service
+
+in de PHP-container zijn de MYSQL_USER/PASSWORD variabelen niet bekend. Zit geen verwijzing naar die secrets in de PHP deployment. Toegevoegd met andere naam.
+Er is in de PHP-container een environment variabele: MGW_MYSQL_SERVICE_SERVICE_HOST=10.121.140.96
+waar komt dat nou weer vandaan?
+
+Die Mysql host is niet te bereiken vanuit de PHP pod (op ip adres).
+
+In namespace stage lukt het nu wel om de mysql vanuit de php te bereiken:
+
+root@mgw-php-55f8f89b8c-7dgqx:/# mysql -h mgw-mysql-service -u browser --password="${MGW_MYSQL_PASSWORD}" 
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+
+Maar vreemd genoeg alleen als ik die environmentvariabele gebruik, niet als ik het wachtwoord letterlijk in het commando zet, en ook niet als ik het wachtwoord intyp.
+
+probleem was dat er een harde return mee gebase64encode was in het secret
+
+Laatste probleem: PHP-deployment moet external-ingress: enabled hebben in spec / template / metadata / labels. In de Pod-definitie dus.

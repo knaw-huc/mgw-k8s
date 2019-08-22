@@ -1,0 +1,18 @@
+# zorg dat je lokaal apache (met PHP) en mysql of mariadb hebt draaien
+
+$ cd <je webroot>
+$ svn co http://meertens.unfuddle.com/svn/meertens_mgw mgw
+$ cd mgw/system
+$ mkdir -p cache/templates_c
+$ chmod 777 cache/templates_c
+
+# dump database 'mgw' van mysql12.meertens.knaw.nl en kopieer naar eigen machine
+
+$ mysql -u root -p -e 'CREATE DATABASE mgw'
+$ mysql -u root -p mgw < mgw.sql
+
+# edit mgw/system/application/config/database.php met een gebruiker die minimaal SELECT-rechten op dataase 'mgw' heeft
+# tip: zet 127.0.0.1	mysql12.meertens.knaw.nl in je /etc/hosts file
+
+# ga naar http://<je lokale webserver>/mgw, site zou moeten laden
+

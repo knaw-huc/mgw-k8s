@@ -1,0 +1,12 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mgw
+spec:
+  rules:
+  - host: mgw.diginfra.net
+    http:
+      paths:
+      - backend:
+          serviceName: mgw-php
+          servicePort: http

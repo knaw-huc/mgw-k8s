@@ -1,0 +1,50 @@
+div#content
+{
+	/* zie: http://www.dustindiaz.com/min-height-fast-hack */
+	min-height: 400px;
+	height: auto !important;
+	padding-bottom: 10px;
+}
+
+td { vertical-align: top; }
+
+td.maattype
+{
+	font-style: italic;
+	white-space: nowrap;
+	width: 90px;
+}
+
+td.maatnaam
+{
+	font-weight: bold;
+	white-space: nowrap;
+}
+
+td.omschrijving
+{
+	width: 300px;
+	font-size: 95%;
+}
+
+span.hoeveelheid { font-weight: normal; }
+
+div.plaatspermaat
+{
+	border-bottom: 1px dotted black;
+	padding-bottom: 10px;
+	margin-top: 10px;
+}
+
+tr.odd { background-color: #eeeeee; }
+tr.even { background-color: #e0e0e0; }
+
+span.bron {margin-left: 20px; font-size: 90%;}
+
+#colofon
+{
+	font-size: 90%;
+	display: none;
+}
+
+span.scheider:last-child {display:none;}

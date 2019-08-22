@@ -1,0 +1,24 @@
+#db_wrapper {
+  border: none; }
+
+div.roderand {
+  border: none; }
+  div.roderand p#copyright {
+    display: none; }
+
+div.header,
+div.footer {
+  display: none; }
+
+td, tr, p, div {
+  font-size: inherit; }
+
+address {
+  background: none;
+  color: inherit;
+  display: block;
+  font-family: inherit;
+  font-size: inherit;
+  font-style: inherit;
+  margin: 0;
+  padding: inherit; }
