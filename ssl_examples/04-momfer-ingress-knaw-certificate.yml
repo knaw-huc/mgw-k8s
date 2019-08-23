@@ -23,12 +23,11 @@ spec:
 # In this case you must create the secret with the certificate yourself before deploying.
 # Assuming you have the .key file and obtained the certificate from ICTS (or TCI):
 #
-# And also that the domain name referenced is in the "real"
-# DNS system and resolves to 194.171.4.29;
-#
 # $ kubectl -n tci-momfer create secret tls momfer.meertens.knaw.nl --key=./momfer_meertens_knaw_nl.key --cert=./momfer_meertens_knaw_nl.crt 
 #
 # Pasting the key and crt into a yaml file yourself is also possible but the above is easier imho.
+#
+# This will also work if the domain name is not yet in the DNS system.
 #
 # $ kubectl -n tci-momfer get secret momfer.meertens.knaw.nl
 # NAME                      TYPE                DATA      AGE
