@@ -4,7 +4,7 @@ metadata:
   name: mgw
 spec:
   rules:
-  - host: mgw.diginfra.net
+  - host: matenengewichten.diginfra.net
     http:
       paths:
       - backend:

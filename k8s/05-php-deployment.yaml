@@ -19,6 +19,7 @@ spec:
       containers:
       - name: php
         image: registry.diginfra.net/apache-php:latest
+        imagePullPolicy: Always
         resources:
           limits:
             cpu: 200m

@@ -112,6 +112,7 @@ spec:
       containers:
       - name: php
         image: registry.diginfra.net/apache-php:latest
+        imagePullPolicy: Always
         resources:
           limits:
             cpu: 200m
@@ -154,7 +155,7 @@ metadata:
   name: mgw
 spec:
   rules:
-  - host: mgw.diginfra.net
+  - host: matenengewichten.diginfra.net
     http:
       paths:
       - backend:
