@@ -37,10 +37,10 @@
 $active_group = "default";
 $active_record = FALSE;
 
-$db['default']['hostname'] = gethostbyname('mgw-mysql-service');
+$db['default']['hostname'] = gethostbyname(getenv('MGW_DB_HOST'));
 $db['default']['username'] = getenv('MGW_MYSQL_USER');
 $db['default']['password'] = getenv('MGW_MYSQL_PASSWORD');
-$db['default']['database'] = "mgw";
+$db['default']['database'] = getenv('MGW_DB');
 $db['default']['dbdriver'] = "mysqli";
 $db['default']['dbprefix'] = "";
 $db['default']['pconnect'] = FALSE;

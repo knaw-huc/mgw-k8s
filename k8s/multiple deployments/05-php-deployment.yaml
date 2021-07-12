@@ -1,13 +1,13 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mgw-php
 spec:
+  selector:
+    matchLabels:
+      app: mgw-php
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
     type: RollingUpdate
   replicas: 1
   template:
@@ -38,5 +38,18 @@ spec:
             secretKeyRef:
               name: mgw-mysql-credentials
               key: mgw_password
+        - name: MGW_DB
+          value: mgw
+        - name: MGW_DB_HOST
+          value: mgw-mysql-service
+        - name: MGW_PROTOCOL
+          value: https
         ports:
         - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1

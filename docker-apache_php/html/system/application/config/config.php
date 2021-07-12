@@ -11,8 +11,11 @@
 |	http://example.com/
 |
 */
-$config['base_url']	= 'http://' . $_SERVER['SERVER_NAME'] . '/mgw/';
-
+$config['base_url']	= getenv('MGW_PROTOCOL') . '://' . $_SERVER['SERVER_NAME'];
+if (getenv('MGW_PORT') !== '') {
+    $config['base_url'] .= ':' . getenv('MGW_PORT');
+}
+$config['base_url'] .= '/';
 /*
 |--------------------------------------------------------------------------
 | Index File

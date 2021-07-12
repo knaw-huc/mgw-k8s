@@ -63,9 +63,9 @@ class Mgw extends Controller {
 		}
 		
 		$maten = $this->MGW_model->getMatenPerPlaats($id);
-		
+		$base_url = base_url();
 		foreach($maten as $k => $maat) {
-			$type_omschrijving = preg_replace('!<zie="(.+?)">(.+)</zie>!', "<a href=\"/mgw/plaats/\\1/\">\\2</a>", $maat['type_omschrijving']);
+			$type_omschrijving = preg_replace('!<zie="(.+?)">(.+)</zie>!', "<a href=\"${base_url}plaats/\\1/\">\\2</a>", $maat['type_omschrijving']);
 			$maten[$k]['type_omschrijving'] = $type_omschrijving;
 		}
 		

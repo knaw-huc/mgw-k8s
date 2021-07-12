@@ -1,0 +1,70 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mgw
+spec:
+  selector:
+    matchLabels:
+      app: mgw
+  strategy:
+    type: RollingUpdate
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: mgw
+        external-ingress: enabled
+    spec:
+      containers:
+      - name: php
+        image: registry.diginfra.net/apache-php:latest
+        imagePullPolicy: Always
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        env:
+        - name: MGW_MYSQL_USER
+          value: browser
+        - name: MGW_MYSQL_PASSWORD
+          value: browsie
+        - name: MGW_DB
+          value: mgw
+        - name: MGW_DB_HOST
+          value: localhost
+        - name: MGW_PROTOCOL
+          value: https
+        ports:
+        - containerPort: 80
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          successThreshold: 1
+      - name: mysql
+        image: registry.diginfra.net/mysql:5.6
+        resources:
+          limits:
+            cpu: 200m
+            memory: 500Mi
+          requests:
+            cpu: 200m
+            memory: 500Mi
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            value: p728dhasuvsf2jft7jezuh
+          - name: MYSQL_DATABASE
+            value: mgw
+          - name: MYSQL_USER
+            value: browser
+          - name: MYSQL_PASSWORD
+            value: browsie
+        ports:
+          - containerPort: 3306
+            name: mgw-mysql

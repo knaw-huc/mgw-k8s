@@ -1,18 +1,18 @@
 {include file="header.tpl"}
-<h1><a href="/mgw/">De oude Nederlandse maten en gewichten</a></h1>
+<h1><a href="{$base_url}">De oude Nederlandse maten en gewichten</a></h1>
 <p>beginletter plaats: {foreach from=$letters item=letter}
-	<a href="/mgw/plaatsen/{$letter}">{$letter|upper}</a> | 
+	<a href="{$base_url}plaatsen/{$letter}">{$letter|upper}</a> | 
 {/foreach}</p>
 <p>provincie: {foreach from=$provincies item=prov}
-	<a href="/mgw/plaatsen/{$prov}">{$prov}</a> | 
+	<a href="{$base_url}plaatsen/{$prov}">{$prov}</a> | 
 {/foreach}</p>
 <p>type: {foreach from=$typen item=type}
-	<a href="/mgw/maten/{$type.id}">{$type.type}</a> | 
+	<a href="{$base_url}maten/{$type.id}">{$type.type}</a> | 
 {/foreach}</p>
 <hr />
 {if $plaatsen}
 	{foreach from=$plaatsen key=plaats_id item=plaats}
-		<a href="/mgw/plaats/{$plaats_id}">{$plaats.plaats}</a> ({if $plaats.regio}{$plaats.regio}, {/if}{$plaats.provincie})<br />
+		<a href="{$base_url}plaats/{$plaats_id}">{$plaats.plaats}</a> ({if $plaats.regio}{$plaats.regio}, {/if}{$plaats.provincie})<br />
 	{/foreach}
 {/if}
 {if $plaatsnaam}
@@ -56,7 +56,7 @@
 {if $maten}
 	<h2>{$maattype}</h2>
 	{foreach from=$maten item=maat}
-		<a href="/mgw/maat/{$maat.id}">{$maat.naam}</a><br />
+		<a href="{$base_url}maat/{$maat.id}">{$maat.naam}</a><br />
 	{/foreach}
 {/if}
 {include file="footer.tpl"}

@@ -1,0 +1,24 @@
+version: '3.7'
+services:
+  db:
+    image: registry.diginfra.net/mysql:5.6
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=p728dhasuvsf2jft7jezuh
+      - MYSQL_DATABASE=mgw
+      - MYSQL_USER=browser
+      - MYSQL_PASSWORD=browsie
+  app:
+    image: registry.diginfra.net/apache-php
+    restart: always
+    ports:
+      - 8000:80
+    environment:
+      - MGW_DB=mgw
+      - MGW_DB_HOST=db
+      - MGW_MYSQL_USER=browser
+      - MGW_MYSQL_PASSWORD=browsie
+      - MGW_PROTOCOL=http
+      - MGW_PORT=8000

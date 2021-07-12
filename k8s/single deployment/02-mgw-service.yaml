@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mgw-service
+  annotations:
+    traefik.ingress.kubernetes.io/affinity: "true"
+spec:
+  selector:
+    app: mgw
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80 # This is where the pod listens to`

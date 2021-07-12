@@ -1,14 +1,14 @@
 ---
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mgw-mysql
 spec:
+  selector:
+    matchLabels:
+      app: mgw-mysql
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
+    type: Recreate
   replicas: 1
   template:
     metadata:
