@@ -1,5 +1,5 @@
 {include file="header.tpl"}
-<h1><a href="/mgw/">De oude Nederlandse maten en gewichten</a>: literatuur</h1>
+<h1><a href="/">De oude Nederlandse maten en gewichten</a>: literatuur</h1>
 <hr />
 <p>
 Anoniem / 'Hoffer'. <cite>Onderrigting aangaande de nieuwe maten en gewigten met de vergelijkende tafelen tusschen de oude maten en gewigten, in de onderscheidene gemeenten, uitmakende het Departement der Bouches du Rhin in gebruik, en die van het nieuwe metrieke stelsel, welke dezelve moeten vervangen</cite>. Uitgegeven door de Commissie tot de maten en gewigten in het departement der Bouches du Rhin. Den Bosch: J.P. Hoffers, 1812. 143 pp., 21 x 24,5 cm. Inhoudsopgave op pp. 111 - 138 (en 143). Heel veel verschillende opgaven, b.v. Nijmeegsche, Bommelsche, Graafsche en Heusdensche ellen, Geldersche en Bredasche voeten, Heusdensche en Woudrichemsche kannen, Nijmeegsch en Woudrichemsch gewicht. Tafels hiervan op pp. 41 - 125. Op bijvoegsel op pp. 136 - 138 wordt een binaire verdeling opgegeven van maten en gewichten, de laatste zelfs tot het 1/8 grein (0,007 gram). Hierbij is het half groot [gros?] gelijk gesteld aan 36 greinen. De term 'syst&egrave;me m&eacute;trique usuel' of een Nederlandse vertaling ervan wordt niet genoemd.</p>

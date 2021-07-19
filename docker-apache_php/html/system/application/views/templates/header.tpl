@@ -21,7 +21,7 @@
   <!-- End Google Tag Manager -->
 {/literal}
 <div class="header">
-<p><a href="/">Home</a><span style="color:white;font-weight:bold;"> &rarr; </span><a href="/databanken/">Databanken</a><span style="color:white;font-weight:bold;"> &rarr; </span><a href="/mgw/">Maten en gewichten</a></p></div>
+<p><a href="/">Home</a><span style="color:white;font-weight:bold;"> &rarr; </span><a href="/databanken/">Databanken</a><span style="color:white;font-weight:bold;"> &rarr; </span><a href="/">Maten en gewichten</a></p></div>
 <div id="db_wrapper"> 
   <div class="roderand"> 
 	<div id="content"> 

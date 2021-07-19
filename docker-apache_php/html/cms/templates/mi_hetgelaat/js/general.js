@@ -197,13 +197,13 @@ function initNav(){
 
     if (fixedNav){
         if ($(document).scrollTop() > fixnavdistance){
-            fixNav();
+            fixNav(fixnavdistance);
         }
     }
     $(window).scroll(function(){
         if ($(window).scrollTop() > fixnavdistance){
             if (!fixedNav){
-                fixNav();
+                fixNav(fixnavdistance);
             }
         } else {
             $("body").addClass('expanded');
@@ -303,8 +303,11 @@ function initCarousel(){
 }
 
 
-function fixNav(){
+function fixNav(fixnavdistance){
    $("body").removeClass('expanded');
+   if ($(window).scrollTop() <= fixnavdistance) {
+       $(window).scrollTop(fixnavdistance + 1);
+   }
 }
 
 

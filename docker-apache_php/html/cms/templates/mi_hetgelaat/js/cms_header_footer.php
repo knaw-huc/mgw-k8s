@@ -1,4 +1,4 @@
-<?php define('CMSPATH', '/cms'); ?>
+<?php define('CMSPATH', '//www.meertens.knaw.nl/cms'); ?>
 <!DOCTYPE html>
 <!--suppress HtmlUnknownTarget, HtmlUnknownAttribute -->
 <html>

@@ -6,12 +6,12 @@ services:
     ports:
       - 3306:3306
     environment:
-      - MYSQL_ROOT_PASSWORD=p728dhasuvsf2jft7jezuh
+      - MYSQL_ROOT_PASSWORD=secret
       - MYSQL_DATABASE=mgw
       - MYSQL_USER=browser
       - MYSQL_PASSWORD=browsie
   app:
-    image: registry.diginfra.net/apache-php
+    image: registry.diginfra.net/php-apache:5.6
     restart: always
     ports:
       - 8000:80

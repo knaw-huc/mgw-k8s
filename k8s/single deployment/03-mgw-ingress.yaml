@@ -2,11 +2,10 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: mgw
+  namespace: legacy
 spec:
   rules:
-  # verzin zelf een unieke hostnaam als je hiermee gaat experimenteren svp
-  # anders weet je nooit waar je uitkomt als meerdere ingresses dezelfde hostnaam claimen
-  - host: matenengewichten.diginfra.net
+  - host: mgw.meertens.knaw.nl
     http:
       paths:
       - backend:

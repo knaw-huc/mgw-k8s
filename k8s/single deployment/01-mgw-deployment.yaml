@@ -3,6 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mgw
+  namespace: legacy
 spec:
   selector:
     matchLabels:
@@ -18,7 +19,7 @@ spec:
     spec:
       containers:
       - name: php
-        image: registry.diginfra.net/apache-php:latest
+        image: registry.diginfra.net/php-apache:5.6
         imagePullPolicy: Always
         resources:
           limits:
@@ -57,8 +58,8 @@ spec:
             cpu: 200m
             memory: 500Mi
         env:
-          - name: MYSQL_ROOT_PASSWORD
-            value: p728dhasuvsf2jft7jezuh
+          - name: MYSQL_RANDOM_ROOT_PASSWORD
+            value: "yes"
           - name: MYSQL_DATABASE
             value: mgw
           - name: MYSQL_USER
