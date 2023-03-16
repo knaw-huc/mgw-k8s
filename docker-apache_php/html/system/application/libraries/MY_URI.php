@@ -11,7 +11,7 @@ class MY_URI extends CI_URI {
 			// compatibility as many are unaware of how characters in the permitted_uri_chars will be parsed as a regex pattern
 			if ( ! preg_match("|^[".str_replace(array('\\-', '\-'), '-', preg_quote($this->config->item('permitted_uri_chars'), '-'))."]+$|i", $str))
 			{
-				header('Location: http://' . $_SERVER['SERVER_NAME'] . '/mgw/');
+				header('Location: ' . base_url());
 			}
 		}
 
